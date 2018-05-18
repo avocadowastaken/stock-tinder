@@ -1,0 +1,50 @@
+{
+  // Setup source directory.
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    // Use dom and latest ES typings.
+    "lib": ["dom", "es2017"],
+    // Use React as jsx renderer.
+    "jsx": "react",
+
+    // Use es2015 modules and let Webpack do the rest.
+    "module": "es2015",
+    // Transpile to with latest ES features and let Babel do the rest.
+    "target": "es2018",
+    // Allow to use node modules.
+    "moduleResolution": "node",
+    // Allow to load modules without typings.
+    "allowJs": true,
+    // Minimize amount of generated code by importing helpers from `tslib`.
+    "importHelpers": true,
+
+    // Synthetically allow to use default imports from CJS modules.
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Specific option for react-native-typescript-transformer
+    "noEmit": true,
+
+    // Workaround to skip errors with `node` and `react-native` typings.
+    "skipLibCheck": true,
+
+    // Strict type checks.
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
+
+    // Dead code checks.
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    // Possible bug checks.
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Experimental features for typestack libs.
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  }
+}
