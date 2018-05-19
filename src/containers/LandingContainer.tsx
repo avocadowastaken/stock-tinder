@@ -3,7 +3,6 @@ import React from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   ListRenderItem,
   Text,
   View,
@@ -12,6 +11,7 @@ import { connectAdvanced } from "react-redux";
 import { createSelector } from "reselect";
 
 import { AppLayout } from "../components/layout/AppLayout";
+import { LazyImage } from "../components/ui/LazyImage";
 import { DEVICE_WIDTH } from "../constants/PlatformConstants";
 import { PhotoDTO } from "../dto/PhotoDTO";
 import { UserDTO } from "../dto/UserDTO";
@@ -52,9 +52,7 @@ export const LandingContainer = enhancer(
 
       return (
         <View>
-          <Image
-            source={{ uri: x.item.url, width: DEVICE_WIDTH, height: 300 }}
-          />
+          <LazyImage width={DEVICE_WIDTH} height={300} photo={x.item} />
 
           <Text>{x.item.name}</Text>
 
