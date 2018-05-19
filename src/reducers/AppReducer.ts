@@ -1,6 +1,7 @@
-import { Action } from "redux";
-import { createRootReducer } from "../helpers/ReduxUtils";
 import { Constants } from "expo";
+import { Action } from "redux";
+
+import { createRootReducer } from "../helpers/ReduxUtils";
 
 export enum AppReducerActions {
   Init = "App/Init",

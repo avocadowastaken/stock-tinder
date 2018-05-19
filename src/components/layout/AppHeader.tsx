@@ -1,7 +1,8 @@
-import React, { isValidElement, ReactNode } from "react";
+import React, { ReactNode, isValidElement } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { STATUS_BAR_HEIGHT } from "../../constants/PlatformConstants";
 import { Link } from "react-router-native";
+
+import { STATUS_BAR_HEIGHT } from "../../constants/PlatformConstants";
 
 const styles = StyleSheet.create({
   button: {

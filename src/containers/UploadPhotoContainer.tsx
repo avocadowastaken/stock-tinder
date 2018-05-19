@@ -1,3 +1,5 @@
+import { ImagePicker, Permissions } from "expo";
+import React from "react";
 import {
   Alert,
   Button,
@@ -7,14 +9,13 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React from "react";
-import { ImagePicker, Permissions } from "expo";
-import { LoadingScreen } from "../components/layout/LoadingScreen";
+import { DispatchProp, connect } from "react-redux";
+
 import { AppLayout } from "../components/layout/AppLayout";
+import { LoadingScreen } from "../components/layout/LoadingScreen";
 import { DEVICE_WIDTH } from "../constants/PlatformConstants";
-import { connect, DispatchProp } from "react-redux";
-import { AppStoreState } from "../store/RootReducer";
 import { resetUploadPhotoState, uploadPhoto } from "../reducers/PhotoReducer";
+import { AppStoreState } from "../store/RootReducer";
 
 const styles = StyleSheet.create({
   textInput: {
@@ -142,9 +143,7 @@ export const UploadPhotoContainer = enhancer(
                     this.resetUploadPhotoState();
                     this.setState({ accessingCamera: true });
 
-                    ImagePicker.launchCameraAsync({
-                      quality: 1,
-                    })
+                    ImagePicker.launchCameraAsync({ quality: 0.1 })
                       .then(x => {
                         this.setState({
                           accessingCamera: false,
@@ -170,7 +169,7 @@ export const UploadPhotoContainer = enhancer(
                     this.setState({ accessingCameraRoll: true });
 
                     ImagePicker.launchImageLibraryAsync({
-                      quality: 1,
+                      quality: 0.1,
                       mediaTypes: "Images",
                     })
                       .then(x => {

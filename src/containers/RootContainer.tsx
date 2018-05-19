@@ -1,13 +1,14 @@
 import React from "react";
 import { connect } from "react-redux";
-import { AppStoreState } from "../store/RootReducer";
-import { UserDTO } from "../dto/UserDTO";
-import { ProfileEditContainer } from "./ProfileEditContainer";
 import { NativeRouter, Route, Switch } from "react-router-native";
-import { NotFoundContainer } from "./NotFoundContainer";
+
+import { UserDTO } from "../dto/UserDTO";
+import { AppStoreState } from "../store/RootReducer";
 import { LandingContainer } from "./LandingContainer";
+import { NotFoundContainer } from "./NotFoundContainer";
+import { ProfileEditContainer } from "./ProfileEditContainer";
 import { UploadPhotoContainer } from "./UploadPhotoContainer";
-import { ProfileContainer } from "./ProfileContainer";
+import { UsersContainer } from "./UsersContainer";
 
 interface Props {
   me?: UserDTO;
@@ -36,11 +37,7 @@ export const RootContainer = enhancer(
                 component={UploadPhotoContainer}
               />
 
-              <Route
-                exact={true}
-                path="/profile"
-                component={ProfileContainer}
-              />
+              <Route exact={true} path="/users" component={UsersContainer} />
 
               <Route
                 exact={true}

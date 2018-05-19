@@ -1,6 +1,19 @@
 import * as firebase from "firebase";
-import { defer, Observable } from "rxjs";
+import { Observable, defer, merge } from "rxjs";
+import { map } from "rxjs/operators";
+
 import { Logger } from "../helpers/Logger";
+
+export enum DatabaseDeltaType {
+  ADDED,
+  CHANGED,
+  REMOVED,
+}
+
+export interface DatabaseDelta<T = {}> {
+  value: T;
+  type: DatabaseDeltaType;
+}
 
 export abstract class BaseDB {
   protected logger = new Logger("DB");
@@ -52,12 +65,6 @@ export abstract class BaseDB {
     });
   }
 
-  public subscribeTo(
-    path: string[],
-  ): Observable<firebase.database.DataSnapshot> {
-    return this.on("value", path);
-  }
-
   public set<T>(path: string[], value: T): Observable<T> {
     return defer(() => {
       const referencePath = this.composePath(path);
@@ -67,5 +74,29 @@ export abstract class BaseDB {
 
       return reference.set(value);
     });
+  }
+
+  public subscribeToValue(
+    path: string[],
+  ): Observable<firebase.database.DataSnapshot> {
+    return this.on("value", path);
+  }
+
+  public subscribeToList(
+    path: string[],
+  ): Observable<DatabaseDelta<firebase.database.DataSnapshot>> {
+    return merge(
+      this.on("child_added", path).pipe(
+        map(x => ({ value: x, type: DatabaseDeltaType.ADDED })),
+      ),
+
+      this.on("child_changed", path).pipe(
+        map(x => ({ value: x, type: DatabaseDeltaType.CHANGED })),
+      ),
+
+      this.on("child_removed", path).pipe(
+        map(x => ({ value: x, type: DatabaseDeltaType.REMOVED })),
+      ),
+    );
   }
 }

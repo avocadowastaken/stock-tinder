@@ -1,10 +1,18 @@
-import { BaseDB } from "./BaseDB";
+import { classToPlain, plainToClass } from "class-transformer";
 import * as firebase from "firebase";
-import { defer } from "rxjs";
+import { mapValues } from "lodash-es";
+import { Observable, defer } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import uuid from "uuid";
-import { switchMap } from "rxjs/operators";
+
 import { PhotoDTO } from "../dto/PhotoDTO";
-import { classToPlain } from "class-transformer";
+import { Dict } from "../helpers/ReduxUtils";
+import { BaseDB, DatabaseDelta } from "./BaseDB";
+
+export type PhotosDatabaseDelta = DatabaseDelta<{
+  readonly userId: string;
+  readonly photos: Dict<PhotoDTO>;
+}>;
 
 export class PhotoDB extends BaseDB {
   private storage: firebase.storage.Storage;
@@ -16,6 +24,20 @@ export class PhotoDB extends BaseDB {
     super({ database, root: "photo" });
 
     this.storage = storage;
+  }
+
+  public subscribeToPhotos(): Observable<PhotosDatabaseDelta> {
+    return this.subscribeToList([]).pipe(
+      map(result => ({
+        type: result.type,
+        value: {
+          userId: result.value.key as string,
+          photos: mapValues(result.value.val(), (x: object) =>
+            plainToClass(PhotoDTO, x),
+          ),
+        },
+      })),
+    );
   }
 
   public uploadPhoto(userId: string, uri: string, name: string) {
@@ -33,7 +55,7 @@ export class PhotoDB extends BaseDB {
             .put(x),
         )
         .then(x => x.ref.getDownloadURL())
-        .then(url => new PhotoDTO({ id, name, url }));
+        .then(url => new PhotoDTO({ id, name, url, createdAt: new Date() }));
     }).pipe(
       switchMap((x: PhotoDTO) => this.set([userId, x.id], classToPlain(x))),
     );

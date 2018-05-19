@@ -1,7 +1,7 @@
 import { Exclude, Expose, Transform } from "class-transformer";
+import { trim } from "lodash-es";
 
 import { BaseDTO } from "./BaseDTO";
-import { trim } from "lodash-es";
 
 @Exclude()
 export class UserDTO extends BaseDTO {
@@ -10,7 +10,20 @@ export class UserDTO extends BaseDTO {
   }
 
   @Expose() public id: string;
+
   @Expose()
   @Transform(x => (!x ? undefined : trim(x)))
   public username?: string;
+
+  @Expose()
+  @Transform(
+    x => {
+      const date = new Date(x);
+
+      return isNaN(date.getTime()) ? new Date() : date;
+    },
+    { toClassOnly: true },
+  )
+  @Transform((x = new Date()) => x.toISOString(), { toPlainOnly: true })
+  public createdAt: Date;
 }

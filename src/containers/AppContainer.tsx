@@ -3,9 +3,9 @@ import * as firebase from "firebase";
 import React from "react";
 import { Provider } from "react-redux";
 
+import { initApp } from "../reducers/AppReducer";
 import { AppStore, configureStore } from "../store/AppStore";
 import { RootContainer } from "./RootContainer";
-import { initApp } from "../reducers/AppReducer";
 
 interface State {
   store?: AppStore;

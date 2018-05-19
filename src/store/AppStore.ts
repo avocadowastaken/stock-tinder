@@ -1,6 +1,6 @@
 import * as firebase from "firebase";
 import { Action, Store, applyMiddleware, createStore } from "redux";
-import { createEpicMiddleware, Epic } from "redux-observable";
+import { Epic, createEpicMiddleware } from "redux-observable";
 
 import { createReduxLoggerMiddleware } from "./ReduxLoggerMiddleware";
 import { rootEpic } from "./RootEpic";

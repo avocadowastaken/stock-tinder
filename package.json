@@ -15,7 +15,8 @@
     "reformat": "yarn reformat:imports && yarn reformat:code",
     "reformat:code": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "reformat:imports": "import-sort --write \"src/**/*.{ts,tsx}\"",
-    "ci": "yarn reformat:imports -l --no-write && yarn reformat:imports -l --no-write && yarn lint && yarn types && yarn test --ci"
+    "ci":
+      "yarn reformat:imports -l --no-write && yarn reformat:imports -l --no-write && yarn lint && yarn types && yarn test --ci"
   },
   "jest": {
     "preset": "jest-expo"

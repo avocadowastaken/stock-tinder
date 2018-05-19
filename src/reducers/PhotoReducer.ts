@@ -1,21 +1,34 @@
+import { DELETE, update } from "immupdate";
+import { mapValues } from "lodash-es";
+import { Action } from "redux";
+import { NEVER, merge, of } from "rxjs";
+import { switchMap } from "rxjs/operators";
+
+import { DatabaseDeltaType } from "../db/BaseDB";
+import { PhotoDB, PhotosDatabaseDelta } from "../db/PhotoDB";
+import { PhotoDTO } from "../dto/PhotoDTO";
 import {
   AsyncRequest,
+  Dict,
+  FulfillAction,
+  PerformAction,
   createAsyncAction,
   createAsyncRequestReducer,
+  createReducer,
   createRootReducer,
-  PerformAction,
 } from "../helpers/ReduxUtils";
 import { AppEpic } from "../store/AppStore";
-import { merge } from "rxjs";
-import { switchMap } from "rxjs/operators";
-import { Action } from "redux";
-import { PhotoDB } from "../db/PhotoDB";
+import { AppReducerActions } from "./AppReducer";
 
 export enum PhotoReducerActions {
   PerformUpload = "Photo/PerformUpload",
   FulfillUpload = "Photo/FulfillUpload",
   RejectUpload = "Photo/RejectUpload",
   ResetUpload = "Photo/ResetUpload",
+
+  PhotoAdded = "Photo/Added",
+  PhotoChanged = "Photo/Changed",
+  PhotoRemoved = "Photo/Removed",
 }
 
 interface UploadMeta {
@@ -23,12 +36,24 @@ interface UploadMeta {
   name: string;
 }
 
+interface PhotosUpdatePayload {
+  userId: string;
+  photos: Dict<PhotoDTO>;
+}
+
 export interface PhotoReducerState {
   readonly upload: AsyncRequest;
+
+  readonly photos: Dict<PhotoDTO>;
+  readonly photoAuthors: Dict<string>;
 }
 
 export const photoReducer = createRootReducer<PhotoReducerState>(
-  { upload: { requested: false, requesting: false, requestFailed: false } },
+  {
+    photos: {},
+    photoAuthors: {},
+    upload: { requested: false, requesting: false, requestFailed: false },
+  },
 
   createAsyncRequestReducer<PhotoReducerState>("upload", [
     PhotoReducerActions.PerformUpload,
@@ -36,6 +61,34 @@ export const photoReducer = createRootReducer<PhotoReducerState>(
     PhotoReducerActions.RejectUpload,
     PhotoReducerActions.ResetUpload,
   ]),
+
+  createReducer<PhotoReducerState>(
+    [PhotoReducerActions.PhotoAdded, PhotoReducerActions.PhotoChanged],
+    (state, { payload }: FulfillAction<PhotosUpdatePayload>) =>
+      update(state, {
+        photos: update(state.photos, payload.photos),
+
+        photoAuthors: update(
+          state.photoAuthors,
+          mapValues(payload.photos, () => payload.userId),
+        ),
+      }),
+  ),
+
+  createReducer<PhotoReducerState>(
+    [PhotoReducerActions.PhotoRemoved],
+    (state, { payload }: FulfillAction<PhotosUpdatePayload>) =>
+      update(state, {
+        photos: update(
+          state.photos,
+          mapValues(payload.photos, () => DELETE as any),
+        ),
+        photoAuthors: update(
+          state.photoAuthors,
+          mapValues(payload.photos, () => DELETE as any),
+        ),
+      }),
+  ),
 );
 
 export const photoReducerEpic: AppEpic = (
@@ -46,6 +99,40 @@ export const photoReducerEpic: AppEpic = (
   const photoDb = new PhotoDB(storage, database);
 
   return merge(
+    actionsStream.ofType(AppReducerActions.Init).pipe(
+      switchMap(() =>
+        photoDb.subscribeToPhotos().pipe(
+          switchMap((x: PhotosDatabaseDelta) => {
+            switch (x.type) {
+              case DatabaseDeltaType.ADDED:
+                return of<FulfillAction<PhotosUpdatePayload>>({
+                  meta: {},
+                  payload: x.value,
+                  type: PhotoReducerActions.PhotoAdded,
+                });
+
+              case DatabaseDeltaType.CHANGED:
+                return of<FulfillAction<PhotosUpdatePayload>>({
+                  meta: {},
+                  payload: x.value,
+                  type: PhotoReducerActions.PhotoChanged,
+                });
+
+              case DatabaseDeltaType.REMOVED:
+                return of<FulfillAction<PhotosUpdatePayload>>({
+                  meta: {},
+                  payload: x.value,
+                  type: PhotoReducerActions.PhotoRemoved,
+                });
+
+              default:
+                return NEVER;
+            }
+          }),
+        ),
+      ),
+    ),
+
     actionsStream
       .ofType(PhotoReducerActions.PerformUpload)
       .pipe(

@@ -1,7 +1,8 @@
-import { View } from "react-native";
 import React, { ReactNode } from "react";
-import { AppTabBar } from "./AppTabBar";
+import { View } from "react-native";
+
 import { AppHeader } from "./AppHeader";
+import { AppTabBar } from "./AppTabBar";
 
 interface Props {
   title: string;
@@ -14,7 +15,7 @@ export class AppLayout extends React.Component<Props> {
       <View flex={1}>
         <AppHeader title={this.props.title} />
 
-        <View flexGrow={1}>{this.props.children}</View>
+        <View flex={1}>{this.props.children}</View>
 
         <AppTabBar />
       </View>

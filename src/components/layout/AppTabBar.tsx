@@ -33,7 +33,7 @@ export class AppTabBar extends React.Component {
       <View flexDirection="row" flex={1} height={64} maxHeight={64}>
         <AppTabBarLink to="/" icon="📑" />
         <AppTabBarLink to="/upload-photo" icon="📸" />
-        <AppTabBarLink to="/profile" icon="👤" />
+        <AppTabBarLink to="/users" icon="👥" />
       </View>
     );
   }

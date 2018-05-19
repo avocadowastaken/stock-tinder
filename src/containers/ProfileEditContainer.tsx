@@ -1,12 +1,13 @@
-import React from "react";
-import { connect, DispatchProp } from "react-redux";
-import { UserDTO } from "../dto/UserDTO";
-import { AppStoreState } from "../store/RootReducer";
-import { LoadingScreen } from "../components/layout/LoadingScreen";
-import { Button, StyleSheet, TextInput, View } from "react-native";
 import { isEqual } from "lodash-es";
-import { updateMe } from "../reducers/UserReducer";
+import React from "react";
+import { Button, StyleSheet, TextInput, View } from "react-native";
+import { DispatchProp, connect } from "react-redux";
+
 import { AppHeader, AppHeaderLink } from "../components/layout/AppHeader";
+import { LoadingScreen } from "../components/layout/LoadingScreen";
+import { UserDTO } from "../dto/UserDTO";
+import { updateMe } from "../reducers/UserReducer";
+import { AppStoreState } from "../store/RootReducer";
 
 const styles = StyleSheet.create({
   textInput: { minWidth: 100, borderWidth: 1 },
